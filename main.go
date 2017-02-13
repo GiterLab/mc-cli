@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 
 	"golang.org/x/net/context"
@@ -23,8 +24,7 @@ func main() {
 	}
 
 	if *host == "" {
-		fmt.Println("[E] User shoud specifies the address of the memcached server")
-		os.Exit(0)
+		*host = "127.0.0.1:11211"
 	}
 
 	MemcacheInit(*host)
@@ -37,6 +37,7 @@ func main() {
 		fmt.Println("\033[32m==============================\033[0m")
 		running := true
 		reader := bufio.NewReader(os.Stdin)
+	Shell:
 		for running {
 			fmt.Printf("\033[32mMC>> \033[0m")
 			data, _, _ := reader.ReadLine()
@@ -47,25 +48,53 @@ func main() {
 			}
 
 			switch cmd[0] {
+			case "bye":
+				fallthrough
 			case "exit":
 				fallthrough
 			case "quit":
 				fallthrough
 			case "q":
 				fmt.Println("  \033[32mQuit\033[0m")
-				os.Exit(0)
+				break Shell
 
-			case "get":
+			case "get": // get key
 				if len(cmd) != 2 {
 					fmt.Println("  \033[32mparam error\033[0m")
 					continue
 				}
-				b, err := MemcacheGet(cmd[0])
+				b, err := MemcacheGet(cmd[1])
 				if err != nil {
 					fmt.Println("  \033[31m" + fmt.Sprintf("[E] %s", err) + "\033[0m")
 					continue
 				}
 				fmt.Println(string(b))
+
+			case "set": // set key value, set key value 60
+				if len(cmd) != 3 && len(cmd) != 4 {
+					fmt.Println("  \033[32mparam error\033[0m")
+					continue
+				}
+				if len(cmd) == 3 {
+					err := MemcacheSet(cmd[1], []byte(cmd[2]))
+					if err != nil {
+						fmt.Println("  \033[31m" + fmt.Sprintf("[E] %s", err) + "\033[0m")
+						continue
+					}
+				}
+				if len(cmd) == 4 {
+					exp, err := strconv.Atoi(cmd[3])
+					if err != nil {
+						fmt.Println("  \033[31m" + fmt.Sprintf("[E] %s", err) + "\033[0m")
+						continue
+					}
+					err = MemcacheSetByExpired(cmd[1], []byte(cmd[2]), int32(exp))
+					if err != nil {
+						fmt.Println("  \033[31m" + fmt.Sprintf("[E] %s", err) + "\033[0m")
+						continue
+					}
+				}
+				fmt.Println("OK")
 
 				// 命令行列表
 			case "list":

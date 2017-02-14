@@ -5,13 +5,12 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"strconv"
 	"strings"
 
 	"golang.org/x/net/context"
 )
 
-var VERSION = "v1.0.0"
+var VERSION = "v0.0.1"
 
 func main() {
 	host := flag.String("host", "", "address of memcached server")
@@ -19,7 +18,7 @@ func main() {
 	flag.Parse()
 
 	if *version {
-		fmt.Println(VERSION)
+		cprintln(VERSION, COLOR_NONE)
 		os.Exit(0)
 	}
 
@@ -29,17 +28,17 @@ func main() {
 
 	MemcacheInit(*host)
 
-	// 命令行处理
+	// handle commands
 	ctx, done := context.WithCancel(context.Background())
 	go func() {
-		fmt.Println("\033[32m==============================\033[0m")
-		fmt.Println("\033[32mWelcome to memcache client    \033[0m")
-		fmt.Println("\033[32m==============================\033[0m")
+		cprintln("==============================", COLOR_GREEN)
+		cprintln("memcache client "+VERSION, COLOR_GREEN)
+		cprintln("==============================", COLOR_GREEN)
 		running := true
 		reader := bufio.NewReader(os.Stdin)
 	Shell:
 		for running {
-			fmt.Printf("\033[32mMC>> \033[0m")
+			cprint("MC>> ", COLOR_GREEN)
 			data, _, _ := reader.ReadLine()
 			data_lower := strings.ToLower(string(data))
 			cmd := strings.Split(data_lower, " ")
@@ -52,6 +51,8 @@ func main() {
 				fallthrough
 			case "exit":
 				fallthrough
+			case "e":
+				fallthrough
 			case "quit":
 				fallthrough
 			case "q":
@@ -59,59 +60,43 @@ func main() {
 				break Shell
 
 			case "get": // get key
-				if len(cmd) != 2 {
-					fmt.Println("  \033[32mparam error\033[0m")
-					continue
-				}
-				b, err := MemcacheGet(cmd[1])
+				err := cmd_get(cmd)
 				if err != nil {
-					fmt.Println("  \033[31m" + fmt.Sprintf("[E] %s", err) + "\033[0m")
+					cprintln(err.Error(), COLOR_RED)
 					continue
 				}
-				fmt.Println(string(b))
+
+			case "getmore": // getmore key
+				err := cmd_getmore(cmd)
+				if err != nil {
+					cprintln(err.Error(), COLOR_RED)
+					continue
+				}
 
 			case "set": // set key value, set key value 60
-				if len(cmd) != 3 && len(cmd) != 4 {
-					fmt.Println("  \033[32mparam error\033[0m")
+				err := cmd_set(cmd)
+				if err != nil {
+					cprintln(err.Error(), COLOR_RED)
 					continue
 				}
-				if len(cmd) == 3 {
-					err := MemcacheSet(cmd[1], []byte(cmd[2]))
-					if err != nil {
-						fmt.Println("  \033[31m" + fmt.Sprintf("[E] %s", err) + "\033[0m")
-						continue
-					}
-				}
-				if len(cmd) == 4 {
-					exp, err := strconv.Atoi(cmd[3])
-					if err != nil {
-						fmt.Println("  \033[31m" + fmt.Sprintf("[E] %s", err) + "\033[0m")
-						continue
-					}
-					err = MemcacheSetByExpired(cmd[1], []byte(cmd[2]), int32(exp))
-					if err != nil {
-						fmt.Println("  \033[31m" + fmt.Sprintf("[E] %s", err) + "\033[0m")
-						continue
-					}
-				}
-				fmt.Println("OK")
 
 				// 命令行列表
 			case "list":
 				fallthrough
 			case "l":
-				fmt.Println("  \033[32m------------------------\033[0m")
-				fmt.Println("  \033[31mlist(l)\033[32m: list commands\033[0m")
-				fmt.Println("  \033[31mquit(q)\033[32m: quit this app\033[0m")
-				fmt.Println("  \033[31mat\033[32m: test command\033[0m")
-				fmt.Println("  \033[31mactive(a)\033[32m: actice a device\033[0m")
-				fmt.Println("  \033[31mstatus(s)\033[32m: check the status of device, offline or online\033[0m")
-				fmt.Println("  \033[31mtemperature(t/r)\033[32m: query the current temperature of device\033[0m")
-				fmt.Println("  \033[31mswitchon(son)\033[32m: turn on the switch of device, maybe a light\033[0m")
-				fmt.Println("  \033[31mswitchoff(soff)\033[32m: turn off the switch of device, maybe a light\033[0m")
+				fallthrough
+			case "h":
+				cprintln("------------------------", COLOR_GREEN)
+				cprintln("  \033[31mset\033[32m: set key value, set key value expiration_time\033[0m", COLOR_NONE)
+				cprintln("  \033[31mget\033[32m: get key\033[0m", COLOR_NONE)
+				cprintln("  \033[31mgetmore\033[32m: getmore key\033[0m", COLOR_NONE)
+
+				cprintln("  \033[31mlist(l)\033[32m: list commands\033[0m", COLOR_NONE)
+				cprintln("  \033[31mquit(q)\033[32m: quit this app\033[0m", COLOR_NONE)
+				cprintln("  \033[31mexit(e)\033[32m: quit this app\033[0m", COLOR_NONE)
 
 			default:
-				fmt.Println("  \033[32mUnknown command\033[0m")
+				cprintln("Unknown command", COLOR_RED)
 			}
 			fmt.Println("")
 		}

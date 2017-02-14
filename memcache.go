@@ -22,6 +22,16 @@ func MemcacheGet(key string) ([]byte, error) {
 	return it.Value, err
 }
 
+// 获取cache更多的信息
+func MemcacheGetMore(key string) (*memcache.Item, error) {
+	it, err := mc.Get(key)
+	if err != nil {
+		return nil, err
+	}
+
+	return it, err
+}
+
 // 设置cache信息
 func MemcacheSet(key string, value []byte) error {
 	item := &memcache.Item{

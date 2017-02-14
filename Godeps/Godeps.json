@@ -1,0 +1,16 @@
+{
+	"ImportPath": "github.com/GiterLab/mc-cli",
+	"GoVersion": "go1.7",
+	"GodepVersion": "v74",
+	"Deps": [
+		{
+			"ImportPath": "github.com/bradfitz/gomemcache/memcache",
+			"Comment": "release.r60-46-g1952afa",
+			"Rev": "1952afaa557dc08e8e0d89eafab110fb501c1a2b"
+		},
+		{
+			"ImportPath": "golang.org/x/net/context",
+			"Rev": "f11d7120b19ae21da5715f3e47621736de1b1da9"
+		}
+	]
+}

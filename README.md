@@ -15,9 +15,9 @@ client tool for memcached
 ### Using ###
 
 	Toby@Giter-Toby-PC MINGW64 /d/prj/go/src/github.com/GiterLab/mc-cli (master)
-	$ ./mc-cli.exe
+	$ ./mc-cli.exe  --> ./mc-cli.exe -host 127.0.0.1:11211 to specify the address of the memcached server
 	==============================
-	memcache client v1.0.0
+	memcache client v0.0.1
 	==============================
 	MC>> set hello tobyzxj
 	OK

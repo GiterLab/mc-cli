@@ -1,7 +1,7 @@
 # mc-cli
 client tool for memcached
 
-### build ###
+### Build ###
 
 		go get -u -v github.com/GiterLab/mc-cli
 

@@ -50,3 +50,8 @@ func MemcacheSetByExpired(key string, value []byte, expiration int32) error {
 	}
 	return mc.Set(item)
 }
+
+// 删除key
+func MemcacheDel(key string) error {
+	return mc.Delete(key)
+}

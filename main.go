@@ -80,6 +80,13 @@ func main() {
 					continue
 				}
 
+			case "del": // del key
+				err := cmd_del(cmd)
+				if err != nil {
+					cprintln(err.Error(), COLOR_RED)
+					continue
+				}
+
 				// 命令行列表
 			case "list":
 				fallthrough
@@ -90,6 +97,7 @@ func main() {
 				cprintln("  \033[31mset\033[32m: set key value, set key value expiration_time\033[0m", COLOR_NONE)
 				cprintln("  \033[31mget\033[32m: get key\033[0m", COLOR_NONE)
 				cprintln("  \033[31mgetmore\033[32m: getmore key\033[0m", COLOR_NONE)
+				cprintln("  \033[31mdel\033[32m: del key\033[0m", COLOR_NONE)
 
 				cprintln("  \033[31mlist(l)\033[32m: list commands\033[0m", COLOR_NONE)
 				cprintln("  \033[31mquit(q)\033[32m: quit this app\033[0m", COLOR_NONE)

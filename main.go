@@ -40,13 +40,12 @@ func main() {
 		for running {
 			cprint("MC>> ", COLOR_GREEN)
 			data, _, _ := reader.ReadLine()
-			data_lower := strings.ToLower(string(data))
-			cmd := strings.Split(data_lower, " ")
+			cmd := strings.Split(string(data), " ")
 			if len(cmd) == 0 || cmd[0] == "" {
 				continue
 			}
 
-			switch cmd[0] {
+			switch strings.ToLower(cmd[0]) {
 			case "bye":
 				fallthrough
 			case "exit":
